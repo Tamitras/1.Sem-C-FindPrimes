@@ -8,4 +8,5 @@
 void main()
 {
 	printf("Dies ist ein Test");
+	printf("Und das auch");
 }
