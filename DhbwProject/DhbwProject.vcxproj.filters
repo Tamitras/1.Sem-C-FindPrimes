@@ -18,5 +18,11 @@
     <ClCompile Include="Main.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="escape.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="datatypes.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

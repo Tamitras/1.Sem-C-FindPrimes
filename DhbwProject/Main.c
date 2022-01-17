@@ -9,34 +9,18 @@
 
 void findPrimeNumbers()
 {
-	//printf("The number of bits in a byte %d\n", CHAR_BIT);
-
-	//printf("The minimum value of CHAR = %d\n", CHAR_MIN);				/*		-128			*/
-	//printf("The maximum value of CHAR = %d\n", CHAR_MAX);				/*		 127			*/
-
-	//printf("The minimum value of SIGNED CHAR = %d\n", SCHAR_MIN);		/*		-128			*/
-	//printf("The maximum value of SIGNED CHAR = %d\n", SCHAR_MAX);		/*		 127			*/
-
-	//printf("The maximum value of UNSIGNED CHAR = %d\n", UCHAR_MAX);		/*		 255			*/
-
-	//printf("The minimum value of SHORT INT = %d\n", SHRT_MIN);			/*		-32768			*/
-	//printf("The maximum value of SHORT INT = %d\n", SHRT_MAX);			/*		 32767			*/
-
-	//printf("The minimum value of INT = %d\n", INT_MIN);					/*		-2147483648		*/
-	//printf("The maximum value of INT = %d\n", INT_MAX);					/*		2147483647		*/
-
-	//printf("The minimum value of LONG = %ld\n", LONG_MIN); 				/*		-2147483648		*/
-	//printf("The maximum value of LONG = %ld\n", LONG_MAX); 				/*		2147483647		*/
-
 	int biggestPrime;
 	int* pbiggestPrime = &biggestPrime;
+	char s[80];
+
+	printf("###                Primzezahl                ###\n\n");
 
 	printf("Weiter mit Enter...: ");
-	char s[80];
+
 	fgets(s, sizeof s, stdin);
 	clock_t begin = clock();
 
-	int intMax = SHRT_MAX;
+	int intMax = SHRT_MAX * 5;
 
 	//for (short i = 1; i <= SHRT_MAX; i++) // Compiler says: inifite loop, 32767 --> 1
 	for (int i = 1; i < intMax; i++)
@@ -123,16 +107,403 @@ void findPrimeNumbers()
 	printf("\n##### 100%% ##### abgeschlossen\n\n");
 	fflush(stdout);
 
-	printf("\a{%d} ist die größte gefundene Primzahl\n", biggestPrime);
+	printf("\a{%d} ist die gr\x94\xe1te gefundene Primzahl\n", biggestPrime);
 	printf("\a{%d} ist die größte gefundene Primzahl\n", *pbiggestPrime);
 	clock_t end = clock();
 	double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
 	printf("Executiontime {%.2lf} secs\n", time_spent);
 }
 
+void hold()
+{
+	char s[80];
+	char temp[255];
+	char exit[255];
+
+	//char name* //// not working
+	//char name* = "" //// not working
+
+	strcpy_s(temp, sizeof(temp), "en");
+	strcpy_s(exit, sizeof(exit), "Schlie\xe1");
+
+	strcat_s(exit, sizeof(exit), temp);
+	printf("\n\n%s mit Enter...", exit);
+	fgets(s, sizeof s, stdin);
+}
+
+void editStrings()
+{
+	char muell[1 + 1];
+
+	printf("Printf as string \n");
+	printf("%s \n\n", muell);
+
+	printf("for loop \n");
+	for (int i = 0; i <= 2200; i++)
+	{
+		printf("%c", muell[i]);
+	}
+}
+
+void stringFunctions()
+{
+	//String Funktionen
+	char t1[600 + 1];
+	char t2[1200];
+
+	//strcpy_s(t1,sizeof(t1), "Hannes");
+	//strcpy_s(t2,sizeof(t2), t1);
+	printf("%p\n", t2);
+	printf("%s", t2);
+
+	for (int i = 0; i < sizeof(t1); i++)
+	{
+		printf("%c", t1[i]);
+	}
+}
+
+void searchForCharInString()
+{
+	char bu = 'n';
+	char temp[255];
+	strcpy_s(temp, sizeof(temp), "Hannes ist doof \n und dumm, lel\n");
+
+	printf("Temp: %s\n\n", temp);
+
+	char* res = strchr(temp, bu);
+	char* res2 = strchr(temp, '\n');
+
+	printf("res: %s", res);
+	printf("res2: %s", res2);
+}
+
+void aufgabeTest()
+{
+	printf("Bitte geben Sie die Baureihe inklusive (-) ein. z.B: {xxx-xxx-x}");
+
+	char gesamt[9 + 1];
+	char br[3 + 1];
+	char charge[3 + 1];
+	char safetyValue[3 + 1];
+	gets_s(gesamt, sizeof(gesamt));
+
+	strncpy_s(br, sizeof(br), gesamt, 3);
+	strncpy_s(charge, sizeof(charge), gesamt + 4, 3);
+	strncpy_s(safetyValue, sizeof(safetyValue), gesamt + 8, 3);
+
+	printf("Baureihe: %s\n", br);
+	printf("Charge: %s\n", charge);
+	printf("Prüfsumme: %s\n", safetyValue);
+
+	// calc prüfsumme
+
+	int pruefSumme = 0;
+	int temp = 0;
+	int* ptrTemp = temp;
+	int* ptrpruefSumme = pruefSumme;
+
+	// durchlaufe 1. BLock
+	for (int i = 0; i < sizeof(br); i++)
+	{
+		int a;
+		char value[3];
+		char c[1];
+
+		if (i % 2 == 0) // gerade zahl
+		{
+			c[0] = br[i];
+			a = atoi(c);
+		}
+		else
+		{
+			c[0] = br[i];
+			a = atoi(c) * 2;
+		}
+
+		if (a >= 10)
+		{
+#pragma warning(suppress : 4996)
+			sprintf(value, "%d", a);
+			//sprintf_s(value,sizeof(),)
+			char val1[1];
+			char val2[1];
+
+			val1[0] = value[0];
+			val2[0] = value[1];
+
+			int numb1 = atoi(val1);
+			int numb2 = atoi(val2);
+
+			int b = numb1 + numb2;
+
+			temp = b;
+		}
+		else
+		{
+			temp = a;
+		}
+
+		printf("Alte Prüfsumme: %d + neuer Wert %d\n", pruefSumme, temp);
+		pruefSumme += temp;
+	}
+
+	// durchlaufe 2. BLock
+	for (int i = 0; i < sizeof(charge); i++)
+	{
+		int a;
+		char value[3];
+		char c[1];
+
+		if (i % 2 != 0) // gerade zahl
+		{
+			c[0] = charge[i];
+			a = atoi(c);
+		}
+		else
+		{
+			c[0] = charge[i];
+			a = atoi(c) * 2;
+		}
+
+		if (a >= 10)
+		{
+#pragma warning(suppress : 4996)
+			sprintf(value, "%d", a);
+			//sprintf_s(value,sizeof(),)
+			char val1[1];
+			char val2[1];
+
+			val1[0] = value[0];
+			val2[0] = value[1];
+
+			int numb1 = atoi(val1);
+			int numb2 = atoi(val2);
+
+			int b = numb1 + numb2;
+
+			temp = b;
+		}
+		else
+		{
+			temp = a;
+		}
+
+		printf("Alte Prüfsumme: %d + neuer Wert %d\n", pruefSumme, temp);
+		pruefSumme += temp;
+	}
+
+	int result = 0;
+	if (pruefSumme <= 10)
+	{
+		result = 10 - pruefSumme;
+	}
+	else if (pruefSumme <= 20)
+	{
+		result = 20 - pruefSumme;
+	}
+	else if (pruefSumme <= 30)
+	{
+		result = 30 - pruefSumme;
+	}
+	else if (pruefSumme <= 40)
+	{
+		result = 40 - pruefSumme;
+	}
+	else if (pruefSumme <= 50)
+	{
+		result = 50 - pruefSumme;
+	}
+	else if (pruefSumme <= 60)
+	{
+		result = 60 - pruefSumme;
+	}
+
+	printf("Berechnete Prüfsumme: %d\n", result);
+
+	char ht[10];
+	//itoa(result, ht, 10);
+	_itoa_s(result, ht, sizeof(ht), 10);
+
+	printf("Berechnete Prüfsumme als charArray: %s\n", ht);
+}
+
+void aufgabeTest2()
+{
+	printf("Bitte geben Sie Ihre Kontonummer an. z.B: {xxxxxxxxxxxxxx} maximal 20\n Kontonummer: ");
+
+	char kn[20 + 1];
+
+	gets_s(kn, sizeof(kn));
+	int len = strlen(kn);
+
+
+	int sum = 0;
+
+	char multiplier[] = { 2,3,4,5,6,7 };
+	int k = 0;
+
+	for (int i = len - 1; i != -1; i--)
+	{
+		if (k >= sizeof(multiplier))
+		{
+			k = 0;
+		}
+
+		int currentMultiplier = (int)multiplier[k];
+		k++;
+
+		char a[1];
+		a[0] = kn[i];
+
+		if (a != 48)
+		{
+			int temp = atoi(a);
+			temp = temp * currentMultiplier;
+			sum += temp;
+			printf("%d wird mit %d multipliziert: Neue Summe: %d\n", atoi(a), currentMultiplier, sum);
+		}
+	}
+
+	printf("Summe: %d \n Modulo:11 \n", sum);
+
+	int rest = sum % 11;
+
+	printf("Rest: %d\n", rest);
+
+	int res = 11 - rest;
+
+	if (res == 10 || res == 11)
+	{
+		res = 0;
+	}
+
+	printf("Pruefsumme: %d\n", res);
+
+	char temp2[2];
+#pragma warning(suppress : 4996)
+	sprintf(temp2, "%d", res);
+
+	strncat_s(kn, sizeof(kn), temp2, len);
+
+	printf("Neue Kontonummer mit Pruefsumme: %s\n", kn);
+
+}
+
+void aufgabeTest3()
+{
+	char gamer1[20];
+	char gamer2[20];
+
+
+
+	printf("Bitte geben Sie einen Namen für Spieler 1 ein:");
+	gets_s(gamer1, sizeof(gamer1));
+	printf("Bitte geben Sie einen Namen für Spieler 2 ein:");
+	gets_s(gamer2, sizeof(gamer2));
+
+	printf("Das Spiel zwischen %s und %s hat begonnen", gamer1, gamer2);
+
+	int min = 0;
+	int max = 1000;
+
+	bool winnerDefined = false;
+
+	for (int i = 0; !winnerDefined; i++)
+	{
+		char eingabe[20];
+		char* currentgamer;
+
+		int zufzahl = getRandom(min, max);
+
+		printf("Zufallszahl: %d", zufzahl);
+
+		if (i % 2 == 0) // gamer1
+		{
+			printf("%s ist am Zug.", gamer1);
+			currentgamer = gamer1;
+		}
+		else //gamer 2
+		{
+			printf("%s ist am Zug.", gamer2);
+			currentgamer = gamer2;
+		}
+		bool userEingabeOkay = false;
+
+		do {
+			printf("Bitte geben Sie eine Zahl zwischen %d und %d ein", min, max);
+			gets_s(eingabe, sizeof(eingabe));
+			int eingabeAsInt = atoi(eingabe);
+
+			if (eingabeAsInt > max || eingabeAsInt < min)
+			{
+				printf("Bitte nochmal versuchen\n");
+			}
+			else
+			{
+				userEingabeOkay = true;
+				if (eingabe == zufzahl)
+				{
+					printf("%s hat gewonnen", currentgamer);
+					winnerDefined = true;
+				}
+				if (eingabe > zufzahl)
+				{
+					min = eingabe;
+				}
+				if (eingabe < zufzahl)
+				{
+					max = eingabe;
+				}
+			}
+
+
+		} while (!userEingabeOkay);
+
+	}
+
+	// zufallszahl zwischen 1 und 1000
+	// obergrenze
+	// untergrenze
+
+	// wer hat gewonnen!?
+}
+/// <summary>
+/// Liefert eine Zufallszahl im Bereich
+/// </summary>
+/// <param name="min">Min Wert</param>
+/// <param name="max">Max Wert</param>
+/// <returns></returns>
+int getRandom(int min, int max)
+{
+	int zufzahl = -1;
+	bool randNumberFound = false;
+	srand(time(NULL));
+
+	while (!randNumberFound)
+	{
+		if (zufzahl < max && zufzahl > min)
+		{
+			randNumberFound = true;
+		}
+		else
+		{
+			zufzahl = rand(); // 32767
+		}
+	}
+
+	return zufzahl;
+}
+
 void main()
 {
-	printf("###                Primzezahl                ###\n\n");
+	//findPrimeNumbers();
+	//editStrings();
+	//stringFunctions();
+	//searchForCharInString();
+	//aufgabeTest();
+	//aufgabeTest2();
+	aufgabeTest3();
 
-	findPrimeNumbers();
+
+	hold();
 }
