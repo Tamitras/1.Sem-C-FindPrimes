@@ -7,9 +7,6 @@
 #include <limits.h>
 #include <time.h>
 
-// function declaration
-void printWinner(struct gamer* currentgamer);
-
 void findPrimeNumbers()
 {
 	int biggestPrime;
@@ -392,101 +389,84 @@ void aufgabeTest2()
 
 }
 
-struct gamer
-{
-	char name[20];
-	int attempts;
-};
-
 void aufgabeTest3()
 {
-	// local variables
+	char gamer1[20];
+	char gamer2[20];
+
+
+
+	printf("Bitte geben Sie einen Namen für Spieler 1 ein:");
+	gets_s(gamer1, sizeof(gamer1));
+	printf("Bitte geben Sie einen Namen für Spieler 2 ein:");
+	gets_s(gamer2, sizeof(gamer2));
+
+	printf("Das Spiel zwischen %s und %s hat begonnen", gamer1, gamer2);
+
 	int min = 0;
 	int max = 1000;
-	int zufzahl = getRandom(min, max);
+
 	bool winnerDefined = false;
-	bool userEingabeOkay = false;
-
-	// Initialize gamer struct/object
-	struct gamer player1 = { "", 0 };
-	struct gamer player2 = { "", 0 };
-	struct gamer* currentgamer;
-
-	// Insert name for player 1
-	printf("Bitte geben Sie einen Namen für Spieler 1 ein:");
-	gets_s(player1.name, sizeof(player1.name));
-
-	// Insert name for player 2
-	printf("Bitte geben Sie einen Namen für Spieler 2 ein:");
-	gets_s(player2.name, sizeof(player2.name));
-
-	printf("Das Spiel zwischen %s und %s hat begonnen\n\n", player1.name, player2.name);
 
 	for (int i = 0; !winnerDefined; i++)
 	{
 		char eingabe[20];
+		char* currentgamer;
+
+		int zufzahl = getRandom(min, max);
+
+		printf("Zufallszahl: %d", zufzahl);
 
 		if (i % 2 == 0) // gamer1
 		{
-			printf("\n%s ist am Zug.\n", player1.name);
-			currentgamer = &player1; // Referenz wird übergeben
+			printf("%s ist am Zug.", gamer1);
+			currentgamer = gamer1;
 		}
 		else //gamer 2
 		{
-			printf("%s ist am Zug.\n", player2.name);
-			currentgamer = &player2;
+			printf("%s ist am Zug.", gamer2);
+			currentgamer = gamer2;
 		}
+		bool userEingabeOkay = false;
 
 		do {
-			printf("Bitte geben Sie eine Zahl zwischen %d und %d ein\n", min, max);
+			printf("Bitte geben Sie eine Zahl zwischen %d und %d ein", min, max);
 			gets_s(eingabe, sizeof(eingabe));
 			int eingabeAsInt = atoi(eingabe);
 
-			if (eingabeAsInt > max || eingabeAsInt < min || eingabeAsInt == 0)
+			if (eingabeAsInt > max || eingabeAsInt < min)
 			{
-				if (eingabeAsInt == 0)
-				{
-					char temp[50];
-					strcpy_s(temp, sizeof(temp), "Bitte eine Zahl gr\x94");
-					strcat_s(temp, sizeof(temp), "\xe1");
-					strcat_s(temp, sizeof(temp), "er 0 eingeben\n");
-					printf("%s", temp);
-				}
-				else
-				{
-					printf("Bitte nochmal versuchen\n");
-				}
+				printf("Bitte nochmal versuchen\n");
 			}
 			else
 			{
 				userEingabeOkay = true;
-				currentgamer->attempts++;
-				if (eingabeAsInt == zufzahl)
+				if (eingabe == zufzahl)
 				{
-					//printf("%s hat gewonnen - %s hat die richtige Zahl geraten und hat %d versuche ben\x94tigt.", currentgamer->name, currentgamer->name, currentgamer->attempts);
-
-					printWinner(currentgamer);
+					printf("%s hat gewonnen", currentgamer);
 					winnerDefined = true;
 				}
-				if (eingabeAsInt > zufzahl)
+				if (eingabe > zufzahl)
 				{
-					max = eingabeAsInt;
+					min = eingabe;
 				}
-				if (eingabeAsInt < zufzahl)
+				if (eingabe < zufzahl)
 				{
-					min = eingabeAsInt;
+					max = eingabe;
 				}
 			}
 
+
 		} while (!userEingabeOkay);
+
 	}
-}
 
-void printWinner(struct gamer* currentgamer)
-{
-	printf("%s hat gewonnen - %s hat die richtige Zahl geraten und %d versuche dafuer ben\x94tigt.", currentgamer->name, currentgamer->name, currentgamer->attempts);
-}
+	// zufallszahl zwischen 1 und 1000
+	// obergrenze
+	// untergrenze
 
+	// wer hat gewonnen!?
+}
 /// <summary>
 /// Liefert eine Zufallszahl im Bereich
 /// </summary>
@@ -507,16 +487,13 @@ int getRandom(int min, int max)
 		}
 		else
 		{
-			zufzahl = rand(); // max 32767
+			zufzahl = rand(); // 32767
 		}
 	}
 
 	return zufzahl;
 }
 
-/// <summary>
-/// Entry Point
-/// </summary>
 void main()
 {
 	//findPrimeNumbers();
@@ -526,6 +503,7 @@ void main()
 	//aufgabeTest();
 	//aufgabeTest2();
 	aufgabeTest3();
+
 
 	hold();
 }

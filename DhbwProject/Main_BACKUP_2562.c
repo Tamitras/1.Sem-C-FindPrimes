@@ -400,6 +400,7 @@ struct gamer
 
 void aufgabeTest3()
 {
+<<<<<<< HEAD
 	// local variables
 	int min = 0;
 	int max = 1000;
@@ -411,46 +412,90 @@ void aufgabeTest3()
 	struct gamer player1 = { "", 0 };
 	struct gamer player2 = { "", 0 };
 	struct gamer* currentgamer;
+=======
+	struct gamer player1;
+	struct gamer player2;
+
+	player1.attempts = 0;
+	player2.attempts = 0;
+>>>>>>> de1633e8ca6d3b2964a76594f3db2495993058bc
 
 	// Insert name for player 1
 	printf("Bitte geben Sie einen Namen für Spieler 1 ein:");
 	gets_s(player1.name, sizeof(player1.name));
+<<<<<<< HEAD
 
 	// Insert name for player 2
 	printf("Bitte geben Sie einen Namen für Spieler 2 ein:");
 	gets_s(player2.name, sizeof(player2.name));
+=======
+
+	printf("Bitte geben Sie einen Namen für Spieler 2 ein:");
+	gets_s(player2.name, sizeof(player2.name));
 
 	printf("Das Spiel zwischen %s und %s hat begonnen\n\n", player1.name, player2.name);
+>>>>>>> de1633e8ca6d3b2964a76594f3db2495993058bc
+
+	printf("Das Spiel zwischen %s und %s hat begonnen\n\n", player1.name, player2.name);
+
+	int zufzahl = getRandom(min, max);
 
 	for (int i = 0; !winnerDefined; i++)
 	{
 		char eingabe[20];
+<<<<<<< HEAD
+=======
+		struct gamer* currentgamer;
+>>>>>>> de1633e8ca6d3b2964a76594f3db2495993058bc
 
 		if (i % 2 == 0) // gamer1
 		{
 			printf("\n%s ist am Zug.\n", player1.name);
+<<<<<<< HEAD
 			currentgamer = &player1; // Referenz wird übergeben
+=======
+			currentgamer = &player1;
+>>>>>>> de1633e8ca6d3b2964a76594f3db2495993058bc
 		}
 		else //gamer 2
 		{
 			printf("%s ist am Zug.\n", player2.name);
 			currentgamer = &player2;
 		}
+<<<<<<< HEAD
+=======
+
+		bool userEingabeOkay = false;
+>>>>>>> de1633e8ca6d3b2964a76594f3db2495993058bc
 
 		do {
 			printf("Bitte geben Sie eine Zahl zwischen %d und %d ein\n", min, max);
 			gets_s(eingabe, sizeof(eingabe));
 			int eingabeAsInt = atoi(eingabe);
 
+<<<<<<< HEAD
 			if (eingabeAsInt > max || eingabeAsInt < min || eingabeAsInt == 0)
 			{
+=======
+			if (eingabeAsInt == 0)
+			{
+
+			}
+
+			if (eingabeAsInt > max || eingabeAsInt < min || eingabeAsInt == 0)
+			{
+>>>>>>> de1633e8ca6d3b2964a76594f3db2495993058bc
 				if (eingabeAsInt == 0)
 				{
 					char temp[50];
 					strcpy_s(temp, sizeof(temp), "Bitte eine Zahl gr\x94");
 					strcat_s(temp, sizeof(temp), "\xe1");
 					strcat_s(temp, sizeof(temp), "er 0 eingeben\n");
+<<<<<<< HEAD
 					printf("%s", temp);
+=======
+					printf("%s",temp);
+>>>>>>> de1633e8ca6d3b2964a76594f3db2495993058bc
 				}
 				else
 				{
@@ -463,9 +508,13 @@ void aufgabeTest3()
 				currentgamer->attempts++;
 				if (eingabeAsInt == zufzahl)
 				{
+<<<<<<< HEAD
 					//printf("%s hat gewonnen - %s hat die richtige Zahl geraten und hat %d versuche ben\x94tigt.", currentgamer->name, currentgamer->name, currentgamer->attempts);
 
 					printWinner(currentgamer);
+=======
+					printf("%s hat gewonnen - %s hat die richtige Zahl geraten und hat %d versuche ben\x94tigt.", currentgamer->name, currentgamer->name, currentgamer->attempts);
+>>>>>>> de1633e8ca6d3b2964a76594f3db2495993058bc
 					winnerDefined = true;
 				}
 				if (eingabeAsInt > zufzahl)
