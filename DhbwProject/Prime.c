@@ -13,6 +13,8 @@
 //#define MAX_NUMBER 100000000 // 100.000.000
 int MAX_NUMBER = 100000;
 
+HANDLE hMutex;
+
 typedef struct Array
 {
 	int* array;
@@ -72,7 +74,7 @@ typedef struct param
 	int* _numbers;
 	int* noPrimes;
 	int* counter;
-} *PMYDATA;
+}*PMYDATA;
 
 void* WorkerFunction(struct param* param)
 {
@@ -104,12 +106,15 @@ void InitializeNumbers(int* _numbers)
 //void calcPrimes(int* from, int* til, int* _numbers, int* noPrimes)
 DWORD WINAPI calcPrimes(struct param* param)
 {
-	int* from = (int*)param->from;
-	int* til = (int*)param->til;
+	int from = param->from;
+	int til = param->til;
+	int max = param->max;
+
 	int* _numbers = (int*)param->_numbers;
 	int* noPrimes = (int*)param->noPrimes;
-	int* max = (int*)param->max;
 	int zero = 0;
+
+	printf("Thread gestartet. Von %d bis %d\n", from, til);
 
 	double time_spent = 0.0;
 	clock_t begin = clock();
@@ -117,7 +122,7 @@ DWORD WINAPI calcPrimes(struct param* param)
 	int teilerFound = 0;
 	int highestTeiler = 2;
 
-	for (int i = *from; i >= *from && i <= *til; i++)
+	for (int i = from; i >= from && i <= til; i++)
 	{
 		if (_numbers[i] == 1)
 		{
@@ -132,15 +137,17 @@ DWORD WINAPI calcPrimes(struct param* param)
 					{
 						if (_numbers[f] == 1)
 						{
+							WaitForSingleObject(hMutex, INFINITE);
 							_numbers[f] = zero;
 							*noPrimes = *noPrimes + 1;
+							ReleaseMutex(hMutex);
 						}
 					}
 				}
 			}
 		}
 
-		if (i == *max / 10) // bis 10%
+		if (i == max / 10) // bis 10%
 		{
 			clock_t end = clock();
 			time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
@@ -148,7 +155,7 @@ DWORD WINAPI calcPrimes(struct param* param)
 			time_spent = 0.0;
 			begin = clock();
 		}
-		if (i == (*max / 10) * 2) // bis 20%
+		if (i == (max / 10) * 2) // bis 20%
 		{
 			clock_t end = clock();
 			time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
@@ -156,7 +163,7 @@ DWORD WINAPI calcPrimes(struct param* param)
 			time_spent = 0.0;
 			begin = clock();
 		}
-		if (i == (*max / 10) * 3) // bis 30%
+		if (i == (max / 10) * 3) // bis 30%
 		{
 			clock_t end = clock();
 			time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
@@ -164,7 +171,7 @@ DWORD WINAPI calcPrimes(struct param* param)
 			time_spent = 0.0;
 			begin = clock();
 		}
-		if (i == (*max / 10) * 4) // bis 40%
+		if (i == (max / 10) * 4) // bis 40%
 		{
 			clock_t end = clock();
 			time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
@@ -172,7 +179,7 @@ DWORD WINAPI calcPrimes(struct param* param)
 			time_spent = 0.0;
 			begin = clock();
 		}
-		if (i == (*max / 10) * 5) // bis 50%
+		if (i == (max / 10) * 5) // bis 50%
 		{
 			clock_t end = clock();
 			time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
@@ -180,7 +187,7 @@ DWORD WINAPI calcPrimes(struct param* param)
 			time_spent = 0.0;
 			begin = clock();
 		}
-		if (i == (*max / 10) * 6) // bis 60%
+		if (i == (max / 10) * 6) // bis 60%
 		{
 			clock_t end = clock();
 			time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
@@ -188,7 +195,7 @@ DWORD WINAPI calcPrimes(struct param* param)
 			time_spent = 0.0;
 			begin = clock();
 		}
-		if (i == (*max / 10) * 7) // bis 70%
+		if (i == (max / 10) * 7) // bis 70%
 		{
 			clock_t end = clock();
 			time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
@@ -196,7 +203,7 @@ DWORD WINAPI calcPrimes(struct param* param)
 			time_spent = 0.0;
 			begin = clock();
 		}
-		if (i == (*max / 10) * 8) // bis 80%
+		if (i == (max / 10) * 8) // bis 80%
 		{
 			clock_t end = clock();
 			time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
@@ -204,7 +211,7 @@ DWORD WINAPI calcPrimes(struct param* param)
 			time_spent = 0.0;
 			begin = clock();
 		}
-		if (i == (*max / 10) * 9) // bis 90%
+		if (i == (max / 10) * 9) // bis 90%
 		{
 			clock_t end = clock();
 			time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
@@ -212,7 +219,7 @@ DWORD WINAPI calcPrimes(struct param* param)
 			time_spent = 0.0;
 			begin = clock();
 		}
-		if (i == *max - 1) // bis 100%
+		if (i == max - 1) // bis 100%
 		{
 			clock_t end = clock();
 			time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
@@ -236,7 +243,8 @@ int CreateErathotenes(int* _numbers, int* noPrimes)
 	DWORD threads[MAX_THREADS];
 	PMYDATA pDataArray[MAX_THREADS];
 
-	HANDLE hMutex = CreateMutex(NULL, TRUE, "MutexExample");
+	//create mutext with this thread the owner of the mutex
+	hMutex = CreateMutex(NULL, TRUE, NULL);
 
 	for (int i = 0; i < MAX_THREADS; i++)
 	{
@@ -253,22 +261,24 @@ int CreateErathotenes(int* _numbers, int* noPrimes)
 			til = MAX_NUMBER / 2;
 			break;
 		case 1:
-			from = MAX_NUMBER / 2;
+			from = (MAX_NUMBER / 2) + 1;
 			til = MAX_NUMBER;
 			break;
 		default:
 			break;
 		}
 
-		pDataArray[i]->from = &from;
-		pDataArray[i]->til = &til;
-		pDataArray[i]->max = &max;
+		//pDataArray[i] = (PMYDATA)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(PMYDATA));
+		pDataArray[i] = malloc(sizeof(PMYDATA));
+		pDataArray[i]->from = from;
+		pDataArray[i]->til = til;
+		pDataArray[i]->max = max;
 		pDataArray[i]->_numbers = _numbers;
 		pDataArray[i]->noPrimes = noPrimes;
 
 		threads[i] = i;
 
-		printf("Thread %d gestartet. Von %d bis %d ThreadID (%u)\n", i, from, til, threads[i]);
+		printf("Thread %d gestartet. Von %d bis %d ThreadID (%u)\n", i, pDataArray[i]->from, pDataArray[i]->til, threads[i]);
 
 		/* create the thread */
 		tHandles[i] = CreateThread(
@@ -279,6 +289,8 @@ int CreateErathotenes(int* _numbers, int* noPrimes)
 			0,						/* default creation    flags */
 			&threads[i]);
 	}
+
+	ReleaseMutex(hMutex);
 
 	WaitForMultipleObjects(MAX_THREADS, tHandles, TRUE, INFINITE);
 
