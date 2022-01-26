@@ -141,9 +141,13 @@
   <ItemGroup>
     <ClCompile Include="datatypes.c" />
     <ClCompile Include="escape.c" />
+    <ClCompile Include="Helper.c" />
     <ClCompile Include="Main.c" />
+    <ClCompile Include="Prime.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Helper.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>

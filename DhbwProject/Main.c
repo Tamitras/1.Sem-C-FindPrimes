@@ -7,6 +7,9 @@
 #include <limits.h>
 #include <time.h>
 
+#include "Helper.h"
+
+
 // function declaration
 void printWinner(struct gamer* currentgamer);
 
@@ -17,13 +20,12 @@ void findPrimeNumbers()
 	char s[80];
 
 	printf("###                Primzezahl                ###\n\n");
-
 	printf("Weiter mit Enter...: ");
 
 	fgets(s, sizeof s, stdin);
 	clock_t begin = clock();
 
-	int intMax = SHRT_MAX * 5;
+	int intMax = SHRT_MAX;
 
 	//for (short i = 1; i <= SHRT_MAX; i++) // Compiler says: inifite loop, 32767 --> 1
 	for (int i = 1; i < intMax; i++)
@@ -88,7 +90,7 @@ void findPrimeNumbers()
 				}
 				else
 				{
-					//printf("{%d} ist KEINE Primzahl, teilbar durch (%d)\n", i, k);
+					printf("{%d} ist KEINE Primzahl, teilbar durch (%d)\n", i, k);
 					tryFindPrimeNumber = false;
 					isPrimeNumber = true;
 					break;
@@ -117,53 +119,6 @@ void findPrimeNumbers()
 	printf("Executiontime {%.2lf} secs\n", time_spent);
 }
 
-void hold()
-{
-	char s[80];
-	char temp[255];
-	char exit[255];
-
-	//char name* //// not working
-	//char name* = "" //// not working
-
-	strcpy_s(temp, sizeof(temp), "en");
-	strcpy_s(exit, sizeof(exit), "Schlie\xe1");
-
-	strcat_s(exit, sizeof(exit), temp);
-	printf("\n\n%s mit Enter...", exit);
-	fgets(s, sizeof s, stdin);
-}
-
-void editStrings()
-{
-	char muell[1 + 1];
-
-	printf("Printf as string \n");
-	printf("%s \n\n", muell);
-
-	printf("for loop \n");
-	for (int i = 0; i <= 2200; i++)
-	{
-		printf("%c", muell[i]);
-	}
-}
-
-void stringFunctions()
-{
-	//String Funktionen
-	char t1[600 + 1];
-	char t2[1200];
-
-	//strcpy_s(t1,sizeof(t1), "Hannes");
-	//strcpy_s(t2,sizeof(t2), t1);
-	printf("%p\n", t2);
-	printf("%s", t2);
-
-	for (int i = 0; i < sizeof(t1); i++)
-	{
-		printf("%c", t1[i]);
-	}
-}
 
 void searchForCharInString()
 {
@@ -392,7 +347,7 @@ void aufgabeTest2()
 
 }
 
-struct gamer
+typedef struct gamer
 {
 	char name[20];
 	int attempts;
@@ -514,18 +469,165 @@ int getRandom(int min, int max)
 	return zufzahl;
 }
 
+int addieren(int a, int b)
+{
+	return a + b;
+}
+
+void addierenPtr(int* a, int* b, int* res)
+{
+	*res = *a + *b;
+}
+
+double up_x(int a, double d, float* _f, char bu, char* _bu, char* text)
+{
+	double derg;
+
+	derg = a + d + *_f + bu, * _bu + text[0];
+
+	return derg;
+}
+
+/// <summary>
+/// Gets the lenght of a string (char array)
+/// </summary>
+/// <param name="param">Text</param>
+/// <returns></returns>
+int schtringlaenge(char* param)
+{
+	int counter = 0;
+	char* firstChar;
+	firstChar = &param[0];
+
+	//printf("\nPointer des ersten Zeichens: %p\n", firstChar);
+
+	for (int i = 0; sizeof(param); i++)
+	{
+		// (index i-1)
+		if (counter > 0)
+		{
+			if (&firstChar[0] == &param[i])
+			{
+				printf("\n# Vergleich #");
+				printf("\n [%c]:%p", firstChar[0], firstChar);
+				printf("\n [%c]:%p\n\n", param[i], &param[i]);
+				break;
+			}
+		}
+
+		if (param[i] != '\0')
+		{
+			printf("Aktueller char: %c - der Poitner dazu: %p\n", param[i], &param[i]);
+			counter++;
+		}
+		else
+		{
+			i = -1;
+			//break;
+		}
+	}
+
+	return counter;
+}
+
+/// <summary>
+/// Copy-Function
+/// </summary>
+/// <param name="t2">Destination</param>
+/// <param name="t1">Source</param>
+schtringkopie(char* t2, char* t1)
+{
+	// t2: Destination
+	// t1: Source
+	for (int i = 0; i <= strlen(t1); i++)
+	{
+		t2[i] = t1[i];
+	}
+}
+
+
+
+long long _atoi(char* str)
+{
+	clock_t begin = clock();
+	long long res = 0;
+	int k = 0;
+	int buffer[255];
+	int negativ = str[0] == 45 ? 1 : 0;
+
+	// get ascii code from char
+	for (int i = 0; str[i] != '\0' || i < strlen(str); i++)
+	{
+		res = str[i] - '0';
+		// filter numbers
+		if (res <= 9 && (res > 0)) //(0-9)
+		{
+			buffer[k] = res;
+			k++;
+		}
+	}
+
+	printf("\nBuffer Length: %d\n", k);
+	int base = k - 1; // z.B. 5 --> 10^5 = 100.000
+	printf("Power: %d\n", base);
+
+	res = 0;
+	int i = 0;
+
+	while (base >= 0)
+	{
+		long long val = 10;
+		if (base == 0)
+		{
+			val = 1;
+		}
+
+		for (int i = 1; i < base; i++)
+		{
+			val *= 10;
+		}
+
+		res += val * buffer[i];
+		printf("Current Number with power: %lld +: %10d \n", res, (val * buffer[i]));
+		i++;
+		base--;
+	}
+
+	if (negativ == 1)
+	{
+		res = res * (-1);
+	}
+
+	clock_t end = clock();
+	double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+	printf("Executiontime {%.2lf} secs\n", time_spent);
+
+	return res;
+}
+
 /// <summary>
 /// Entry Point
 /// </summary>
-void main()
+void mainOld()
 {
 	//findPrimeNumbers();
+	// 
 	//editStrings();
 	//stringFunctions();
 	//searchForCharInString();
 	//aufgabeTest();
 	//aufgabeTest2();
-	aufgabeTest3();
+	// 
+	//aufgabeTest3();
+
+	printf("Bitte geben Sie eine Zahl ein\n\n");
+
+	char text[255];
+
+	gets_s(text, sizeof(text));
+
+	long long myNewNumber = _atoi(text);
+	printf("\n --> Eingegebene Zahl: %lld\n", myNewNumber);
 
 	hold();
 }
