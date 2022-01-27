@@ -9,8 +9,9 @@
 #include "Helper.h"
 #include <windows.h>
 
-#define MAX_THREADS 2
+#define MAX_THREADS 10
 //#define MAX_NUMBER 100000000 // 100.000.000
+//int MAX_NUMBER = 10000; // 1229
 int MAX_NUMBER = 100000;
 
 HANDLE hMutex;
@@ -114,7 +115,7 @@ DWORD WINAPI calcPrimes(struct param* param)
 	int* noPrimes = (int*)param->noPrimes;
 	int zero = 0;
 
-	printf("Thread gestartet. Von %d bis %d\n", from, til);
+	printf("Thread gestartet. Calculation von %d bis %d\n", from, til);
 
 	double time_spent = 0.0;
 	clock_t begin = clock();
@@ -126,107 +127,112 @@ DWORD WINAPI calcPrimes(struct param* param)
 	{
 		if (_numbers[i] == 1)
 		{
-			for (int k = highestTeiler; k < MAX_NUMBER && k < i; k++)
+			for (int k = 2; k < MAX_NUMBER && k < i; k++)
 			{
 				if (_numbers[k] == 1 && i % k == 0 && i > highestTeiler) // k teilt i z.B. 2 teilt 4
 				{
 					teilerFound = 1;
-					highestTeiler = k;
+					if (highestTeiler != k)
+					{
+						highestTeiler = k;
+						//printf("New Teiler: %d\n",k);
+					}
 
 					for (int f = i; f < MAX_NUMBER; f = f + k)
 					{
-						if (_numbers[f] == 1)
+						WaitForSingleObject(hMutex, INFINITE);
+						if (_numbers[f] == 1) // iterate from i til end with element k
 						{
-							WaitForSingleObject(hMutex, INFINITE);
 							_numbers[f] = zero;
 							*noPrimes = *noPrimes + 1;
-							ReleaseMutex(hMutex);
+							//printf("Not a Prime: %d\n",f);
 						}
+						ReleaseMutex(hMutex);
 					}
 				}
 			}
 		}
 
-		if (i == max / 10) // bis 10%
-		{
-			clock_t end = clock();
-			time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
-			printf("Benötigte Zeit bis 10%% %f seconds\n", time_spent);
-			time_spent = 0.0;
-			begin = clock();
-		}
-		if (i == (max / 10) * 2) // bis 20%
-		{
-			clock_t end = clock();
-			time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
-			printf("Benötigte Zeit bis 20%% %f seconds\n", time_spent);
-			time_spent = 0.0;
-			begin = clock();
-		}
-		if (i == (max / 10) * 3) // bis 30%
-		{
-			clock_t end = clock();
-			time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
-			printf("Benötigte Zeit bis 30%% %f seconds\n", time_spent);
-			time_spent = 0.0;
-			begin = clock();
-		}
-		if (i == (max / 10) * 4) // bis 40%
-		{
-			clock_t end = clock();
-			time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
-			printf("Benötigte Zeit bis 40%% %f seconds\n", time_spent);
-			time_spent = 0.0;
-			begin = clock();
-		}
-		if (i == (max / 10) * 5) // bis 50%
-		{
-			clock_t end = clock();
-			time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
-			printf("Benötigte Zeit bis 50%% %f seconds\n", time_spent);
-			time_spent = 0.0;
-			begin = clock();
-		}
-		if (i == (max / 10) * 6) // bis 60%
-		{
-			clock_t end = clock();
-			time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
-			printf("Benötigte Zeit bis 60%% %f seconds\n", time_spent);
-			time_spent = 0.0;
-			begin = clock();
-		}
-		if (i == (max / 10) * 7) // bis 70%
-		{
-			clock_t end = clock();
-			time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
-			printf("Benötigte Zeit bis 70%% %f seconds\n", time_spent);
-			time_spent = 0.0;
-			begin = clock();
-		}
-		if (i == (max / 10) * 8) // bis 80%
-		{
-			clock_t end = clock();
-			time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
-			printf("Benötigte Zeit bis 80%% %f seconds\n", time_spent);
-			time_spent = 0.0;
-			begin = clock();
-		}
-		if (i == (max / 10) * 9) // bis 90%
-		{
-			clock_t end = clock();
-			time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
-			printf("Benötigte Zeit bis 90%% %f seconds\n", time_spent);
-			time_spent = 0.0;
-			begin = clock();
-		}
-		if (i == max - 1) // bis 100%
-		{
-			clock_t end = clock();
-			time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
-			printf("Benötigte Zeit bis 100%% %f seconds\n", time_spent);
-			time_spent = 0.0;
-			begin = clock();
-		}
+		//if (i == max / 10) // bis 10%
+		//{
+		//	clock_t end = clock();
+		//	time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+		//	printf("Benötigte Zeit bis 10%% %f seconds\n", time_spent);
+		//	time_spent = 0.0;
+		//	begin = clock();
+		//}
+		//if (i == (max / 10) * 2) // bis 20%
+		//{
+		//	clock_t end = clock();
+		//	time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+		//	printf("Benötigte Zeit bis 20%% %f seconds\n", time_spent);
+		//	time_spent = 0.0;
+		//	begin = clock();
+		//}
+		//if (i == (max / 10) * 3) // bis 30%
+		//{
+		//	clock_t end = clock();
+		//	time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+		//	printf("Benötigte Zeit bis 30%% %f seconds\n", time_spent);
+		//	time_spent = 0.0;
+		//	begin = clock();
+		//}
+		//if (i == (max / 10) * 4) // bis 40%
+		//{
+		//	clock_t end = clock();
+		//	time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+		//	printf("Benötigte Zeit bis 40%% %f seconds\n", time_spent);
+		//	time_spent = 0.0;
+		//	begin = clock();
+		//}
+		//if (i == (max / 10) * 5) // bis 50%
+		//{
+		//	clock_t end = clock();
+		//	time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+		//	printf("Benötigte Zeit bis 50%% %f seconds\n", time_spent);
+		//	time_spent = 0.0;
+		//	begin = clock();
+		//}
+		//if (i == (max / 10) * 6) // bis 60%
+		//{
+		//	clock_t end = clock();
+		//	time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+		//	printf("Benötigte Zeit bis 60%% %f seconds\n", time_spent);
+		//	time_spent = 0.0;
+		//	begin = clock();
+		//}
+		//if (i == (max / 10) * 7) // bis 70%
+		//{
+		//	clock_t end = clock();
+		//	time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+		//	printf("Benötigte Zeit bis 70%% %f seconds\n", time_spent);
+		//	time_spent = 0.0;
+		//	begin = clock();
+		//}
+		//if (i == (max / 10) * 8) // bis 80%
+		//{
+		//	clock_t end = clock();
+		//	time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+		//	printf("Benötigte Zeit bis 80%% %f seconds\n", time_spent);
+		//	time_spent = 0.0;
+		//	begin = clock();
+		//}
+		//if (i == (max / 10) * 9) // bis 90%
+		//{
+		//	clock_t end = clock();
+		//	time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+		//	printf("Benötigte Zeit bis 90%% %f seconds\n", time_spent);
+		//	time_spent = 0.0;
+		//	begin = clock();
+		//}
+		//if (i == max - 1) // bis 100%
+		//{
+		//	clock_t end = clock();
+		//	time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+		//	printf("Benötigte Zeit bis 100%% %f seconds\n", time_spent);
+		//	time_spent = 0.0;
+		//	begin = clock();
+		//}
 	}
 	return 0;
 }
@@ -243,32 +249,18 @@ int CreateErathotenes(int* _numbers, int* noPrimes)
 	DWORD threads[MAX_THREADS];
 	PMYDATA pDataArray[MAX_THREADS];
 
-	//create mutext with this thread the owner of the mutex
+	//create mutex - with this thread the owner of the mutex
 	hMutex = CreateMutex(NULL, TRUE, NULL);
 
 	for (int i = 0; i < MAX_THREADS; i++)
 	{
-		struct param myParam1;
-
 		int from = 0;
 		int til = MAX_NUMBER;
 		int max = MAX_NUMBER;
 
-		switch (i)
-		{
-		case 0:
-			from = 0;
-			til = MAX_NUMBER / 2;
-			break;
-		case 1:
-			from = (MAX_NUMBER / 2) + 1;
-			til = MAX_NUMBER;
-			break;
-		default:
-			break;
-		}
+		from = (MAX_NUMBER / MAX_THREADS) * (i)+1;
+		til = (MAX_NUMBER / MAX_THREADS) * (i + 1);
 
-		//pDataArray[i] = (PMYDATA)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(PMYDATA));
 		pDataArray[i] = malloc(sizeof(PMYDATA));
 		pDataArray[i]->from = from;
 		pDataArray[i]->til = til;
@@ -298,6 +290,7 @@ int CreateErathotenes(int* _numbers, int* noPrimes)
 	{
 		CloseHandle(tHandles[i]);
 	}
+	WaitForSingleObject(hMutex, INFINITE);
 }
 
 void FindPrimes()

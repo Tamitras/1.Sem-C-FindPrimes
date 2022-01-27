@@ -33,7 +33,7 @@ void hold()
 
 	strcat_s(exit, sizeof(exit), temp);
 
-	printDatum();
+	//printDatum();
 	printf("\n%s mit Enter...", exit);
 	fgets(s, sizeof s, stdin);
 }
