@@ -9,7 +9,8 @@
 #include "Helper.h"
 #include <windows.h>
 
-#define MAX_THREADS 1
+//#define MAX_THREADS 4
+#define MAX_THREADS 10
 //#define MAX_NUMBER 100000000 // 100.000.000
 //int MAX_NUMBER = 1.000; // 168
 //int MAX_NUMBER = 10.000; // 1229
@@ -17,8 +18,10 @@
 //int MAX_NUMBER = 1.000.000; // 78498
 //int MAX_NUMBER = 10.000.000; // 664579
 //int MAX_NUMBER = 100.000.000; // 5761455
-int MAX_NUMBER = 10000;
-HANDLE hMutex;
+int MAX_NUMBER = 100000000;
+int MAX_THREADS_COUNT = 2;
+
+static int* __restrict _NUMBERS; //__restrict performance boost
 
 typedef struct Array
 {
@@ -31,6 +34,11 @@ void initArray(Array* a, size_t initialSize) {
 	a->array = (int*)malloc(initialSize * sizeof(int));
 	a->used = 0;
 	a->size = initialSize;
+}
+
+void printPtr(void* ptr)
+{
+	printf(" Pointer: %p  --> zeigt Adress(&): %d\n\n", ptr, &ptr);
 }
 
 void insertArray(Array* a, int element) {
@@ -81,95 +89,66 @@ typedef struct param
 	int* counter;
 }*PMYDATA;
 
-void* WorkerFunction(struct param* param)
-{
-	long* myId = (long*)param->workerId;
-	int counter = (int*)param->counter;
 
-	for (int i = 1; i <= counter; i++)
-	{
-		printf("\n%2ld (%d run) wird ausgeführt. Sleeping\n", *myId, i);
-		Sleep(2000);
-		printf("%2ld (%d run) wurde   beendet.\n", *myId, i);
-	}
-}
-
-void InitializeNumbers(int* _numbers)
+void InitializeNumbers()
 {
 	double time_spent = 0.0;
 	clock_t begin = clock();
 
+	//printf("Alle geraden Zahlen sind keine Primzahlen und werden somit ignoriert\n");
 	for (int i = 3; i <= MAX_NUMBER; i += 2)
 	{
-		_numbers[i] = 1;
+		_NUMBERS[i] = 1;
+		//printf("Am Index: %d ist nun %d\n", i, _NUMBERS[i]);
 	}
 
 	clock_t end = clock();
 	time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
-	printf("Initialisierung %f seconds with (%d) and %d \n\n", time_spent, _numbers, &_numbers);
+	printf("Initialisierung %f seconds with (%d) and %d \n\n", time_spent, _NUMBERS, &_NUMBERS);
 	time_spent = 0.0;
 	begin = clock();
 }
-
 
 /// <param name="from"></param>
 /// <param name="til"></param>
 /// <param name="_numbers"></param>
 /// <param name="noPrimes"></param>
 //void calcPrimes(int* from, int* til, int* _numbers, int* noPrimes)
-DWORD WINAPI calcPrimes(struct param* param)
+DWORD WINAPI calcPrimes(struct param* p)
 {
-	DWORD  dwWaitResult;
-	int from = param->from;
-	int til = param->til;
-	int max = param->max;
-
-	//int* _numbers = (int*)param->_numbers;
-
-	printf("Inside new Thread - Calculation von %d bis %d. Adresse von NumberPointer: %d (%d)\n\n", from, til, param->_numbers, &(*param)._numbers);
-
-	double time_spent = 0.0;
-	clock_t begin = clock();
-
 	// Sieve
-	for (long long i = from; i <= til; i += 2)
-	{
-		if (param->_numbers[i] == 1)
-		{
-			for (long long p = (i * i); p < til; p = p + i)
-			{
-				param->_numbers[p] = 0;
-			}
-		}
-	}
-	
+	if ((int)p->from == 0) (int)p->from = 3;
+	if ((int)p->from % 2 == 0) (int)p->from++;
+	for (long long i = (int)p->from; i <= (int)p->til; i += 2)
+		if (_NUMBERS[i] == 1)
+			for (long long p = (i * i); p <= MAX_NUMBER; p = p + i)
+				if (_NUMBERS[p] == 1) _NUMBERS[p] = 0;
+
 	return 0;
 }
 
-int CreateErathotenes(Array * a)
+int CreateErathotenes()
 {
 	HANDLE tHandles[MAX_THREADS];
 	DWORD threads[MAX_THREADS];
 	PMYDATA pDataArray[MAX_THREADS];
 
+	//printPtr(_NUMBERS);
+
 	for (int i = 0; i < MAX_THREADS; i++)
 	{
 		int from = 0;
 		int til = MAX_NUMBER;
-		int max = MAX_NUMBER;
 
-		from = (MAX_NUMBER / MAX_THREADS) * (i)+1;
-		til = (MAX_NUMBER / MAX_THREADS) * (i + 1);
+		from = (MAX_NUMBER / MAX_THREADS) * (i);
+		til = (MAX_NUMBER / MAX_THREADS) * (i + 1) - 1;
 
 		pDataArray[i] = malloc(sizeof(PMYDATA));
 		pDataArray[i]->from = from;
 		pDataArray[i]->til = til;
-		pDataArray[i]->max = max;
-		pDataArray[i]->_numbers = a->array;
-
 		threads[i] = i;
 
-		printf("Thread %d gestartet. Von %d bis %d ThreadID (%u) Adresse von NumberPointer: %d (%d)\n", i, pDataArray[i]->from, pDataArray[i]->til, threads[i], pDataArray[i]->_numbers, a->array);
+		//WaitForSingleObject(threads[0], INFINITE);
 
 		/* create the thread */
 		tHandles[i] = CreateThread(
@@ -191,14 +170,16 @@ int CreateErathotenes(Array * a)
 	//WaitForSingleObject(hMutex, INFINITE);
 }
 
-void countPrimes(int* _numbers, int* counter)
+void countPrimes(int* counter)
 {
-	for (size_t i = 0; i < MAX_NUMBER; i++)
+	printPtr(_NUMBERS);
+
+	for (int i = 1; i <= MAX_NUMBER; i++)
 	{
-		if (_numbers[i] == 1)
+		if (_NUMBERS[i] == 1)
 		{
 			*counter = *counter + 1;
-			//printf("Prime found:%d \n", i);
+			//printf("Prime found on Index:%d \n", i);
 		}
 
 		//if (_numbers[i] != 0)
@@ -211,37 +192,33 @@ void countPrimes(int* _numbers, int* counter)
 
 void FindPrimes()
 {
+	// Globale Variable --> Speicher wird reserviert
+	_NUMBERS = (int*)malloc(MAX_NUMBER * sizeof(int));
+	printf("Initialisierung(malloc)\n");
+
+	int found = 0;
 	struct Array _numbers;
 	initArray(&_numbers, MAX_NUMBER);
-	int noPrimes = 0;
 
 	// to store the execution time of code
 	double time_spent = 0.0;
 	clock_t begin = clock();
 
-	InitializeNumbers(_numbers.array); // ALle Stellen wurden mit 1 überschrieben
+	//InitializeNumbers(_numbers.array); // ALle Stellen wurden mit 1 überschrieben
+	InitializeNumbers(); // ALle Stellen wurden mit 1 überschrieben
 
-	//DWORD threadid;
-	//HANDLE tempHandle = CreateThread(
-	//	NULL,					/* default security attributes */
-	//	0,						/* default stack size */
-	//	InitializeNumbers,		/* thread function */
-	//	_numbers.array,			/* parameter to thread function */
-	//	0,						/* default creation    flags */
-	//	&threadid);
-
-
-	printf("CreateEra called with adress: %d and %d\n", _numbers.array, &_numbers.array);
-	CreateErathotenes(&_numbers);
-	_numbers.array[0] = 0;
-	_numbers.array[1] = 0;
-	_numbers.array[2] = 1;
-	_numbers.array[3] = 1;
-
-	int found = 0;
-	countPrimes(_numbers.array, &found);
-
+	//printf("CreateEra called with adress: %p and %d\n", _NUMBERS, &_NUMBERS);
+	CreateErathotenes();
 	clock_t end = clock();
+
+	// Special case
+	_NUMBERS[0] = 0;
+	_NUMBERS[1] = 0;
+	_NUMBERS[2] = 1;
+	_NUMBERS[3] = 1;
+
+	countPrimes(&found);
+
 	// calculate elapsed time by finding difference (end - begin) and
 	// dividing the difference by CLOCKS_PER_SEC to convert to seconds
 	time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
@@ -252,9 +229,7 @@ void FindPrimes()
 	freeArray(&_numbers);
 }
 
-
-
-void main() {
+int main() {
 
 	FindPrimes();
 	hold();
