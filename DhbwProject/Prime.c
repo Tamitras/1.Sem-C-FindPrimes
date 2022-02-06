@@ -5,51 +5,39 @@
 #include <windows.h>
 
 int num_threads = 4; // threads
-unsigned long long max_number = 100000000; // maxNumber
+long long max_number = 100000000; // maxNumber
 
-typedef char sieve_t;
+typedef char sieve_t; // change to int decrease performance 
 static sieve_t* __restrict sieve; // keyword to let the compiler do some optimizations for speed
+HANDLE* tHandles;
+DWORD* threads;
+int* data;
 
 void initialize_sieve(void)
 {
-	sieve = (sieve_t*)calloc(max_number + 1, sizeof(sieve_t)); // 0 initialized
 	sieve[2] = 1; // special case
 	for (register unsigned int i = 3; i <= max_number; i += 2)
 		sieve[i] = 1; // pre set all not even numbers to 1
 }
 
-DWORD WINAPI run_sieve_func(void* data) // Null Pointer as parameter
+void run_sieve_func(void* data) // Null Pointer as parameter
 {
-	register unsigned int max_i = sqrt(max_number); // Get the root of MaxNumber
-	register int _data = *(int*)data; // cast void pointer to int pointer an get value of this pointer
+	int max_i = sqrt(max_number); // Get the root of MaxNumber
+	int _data = *(int*)data; // cast void pointer to int pointer an get value of this pointer
 
 	// Keyword register means that the variable is stored in cpu register instead of RAM --> faster location/access
-	for (register unsigned int i = _data; i <= max_i; i += 2 * num_threads)
+	for (register int i = _data; i <= max_i; i += 2 * num_threads)
 		if (sieve[i])
-			for (register unsigned int k = i * i; k <= max_number; k += i)
-				if (sieve[k])
-					sieve[k] = 0;
-
-	return 0;
+			for (register int k = i * i; k <= max_number; k += i)
+				if (sieve[k]) sieve[k] = 0;
 }
 
 void run_sieve(void)
 {
-	/*
-	Microsoft C Compiler definitions --> not working with GNU/Unix Compiler
-	typedef uint8_t BYTE;
-	typedef uint16_t WORD;
-	typedef uint32_t DWORD;
-	typedef uint64_t QWORD;
-	*/
-
-	HANDLE* tHandles = (HANDLE*)malloc(num_threads * sizeof(HANDLE));
-	DWORD* threads = (DWORD*)malloc(num_threads * sizeof(DWORD));
-	int* data = (int*)malloc(num_threads * sizeof(int));
-
 	// Run with Threads
-	for (register unsigned int i = 0; i < num_threads; i++) {
-		data[i] = 3 + 2 * i; // data basis of odd numbers
+	for (register int i = 0; i < num_threads; i++) {
+		data[i] = 3 + 2 * i; // Database of odd numbers
+		//printf("Thread started with: %d and offset: %d\n", 3 + 2 * i, i);
 		threads[i] = i;
 
 		tHandles[i] = CreateThread(
@@ -75,25 +63,23 @@ void run_sieve(void)
 	free(tHandles);
 }
 
-
 long count_primes(void)
 {
 	long count = 0;
-	for (register long long i = 1; i <= max_number; i++)
+	for (register int i = 1; i <= max_number; i++)
 		count += sieve[i];
 
 	return count;
 }
 
-
 int main(int argc, char* argv[])
 {
 	if (argc > 1) {
-		num_threads = atoi(argv[1]); // char to integer (ato[I]nt)
+		num_threads = atoi(argv[0]); // char to integer (ato[I]nt)
 	}
 
 	if (argc > 2) {
-		max_number = atoll(argv[2]); // char to long long (ato[L]ong[L]ong)
+		max_number = atoll(argv[1]); // char to long long (ato[L]ong[L]ong)
 	}
 
 	// Print arguments
@@ -104,6 +90,16 @@ int main(int argc, char* argv[])
 	double time_spent, total_time;
 	clock_t begin, end;
 	total_time = 0.0;
+
+	/*Microsoft C Compiler definitions --> not working with GNU/Unix Compiler
+	typedef uint8_t BYTE;
+	typedef uint16_t WORD;
+	typedef uint32_t DWORD;
+	typedef uint64_t QWORD;*/
+	sieve = (sieve_t*)calloc(max_number + 1, sizeof(sieve_t)); // 0 initialized
+	tHandles = (HANDLE*)malloc(num_threads * sizeof(HANDLE));
+	threads = (DWORD*)malloc(num_threads * sizeof(DWORD));
+	data = (int*)malloc(num_threads * sizeof(int));
 
 	printf("----------------------------------------------------------------------\n");
 
@@ -147,7 +143,7 @@ int main(int argc, char* argv[])
 
 	free(sieve); // deallocation memory of sieve
 
-	scanf_s("%d", &count);
+	//scanf_s("%d", &count);
 
 	return 0;
 }
